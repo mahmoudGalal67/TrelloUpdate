@@ -2,6 +2,9 @@ import Button from "react-bootstrap/Button";
 import CloseButton from "react-bootstrap/CloseButton";
 
 import { useState } from "react";
+import Card from "../card/Card";
+
+const cards = [1, 2, 3, , 4, 5];
 
 function List() {
   const [showCardList, setshowCardList] = useState(false);
@@ -9,11 +12,9 @@ function List() {
     <div className="list">
       <h3>test</h3>
       <div className="wrapper">
-        <div className="item">test</div>
-        <div className="item">test</div>
-        <div className="item">test</div>
-        <div className="item">test</div>
-        <div className="item">test</div>
+        {cards.map((item) => (
+          <Card id={item} />
+        ))}
 
         <div className="addList addListCard">
           <img src="plus.svg" alt="" />

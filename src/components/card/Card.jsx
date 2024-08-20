@@ -1,4 +1,21 @@
-<div className="card">
-  <img src="photo-1675981004510-4ec798f42006.jpg" alt="" />
-  <p>first workspace</p>
-</div>;
+import React, { useState } from "react";
+
+import "./card.css";
+import CardDetails from "../CardDetails/CardDetails";
+
+function Card({ id }) {
+  const [open, setOpen] = useState(false);
+
+  const onOpenModal = () => setOpen(true);
+  const onCloseModal = () => setOpen(false);
+  return (
+    <>
+      <div className="item" onClick={onOpenModal}>
+        {id} card
+      </div>
+      <CardDetails id={id} onCloseModal={onCloseModal} open={open} />
+    </>
+  );
+}
+
+export default Card;

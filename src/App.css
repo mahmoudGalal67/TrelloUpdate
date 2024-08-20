@@ -1,5 +1,8 @@
 .views {
   margin: 45px 0;
+  padding: 0 6%;
+  padding-top: 48px;
+  width: 100vw;
 }
 
 .views .wrapper {
@@ -82,4 +85,26 @@ input {
   width: 3rem;
   height: 3rem;
   border-width: 0.4rem;
+}
+
+button.save {
+  padding: 6px 12px;
+  border-radius: 3px;
+  background-color: #85b8ff;
+  color: black;
+  border: none;
+  cursor: pointer;
+  margin-right: 15px;
+}
+button.cancel {
+  padding: 6px 12px;
+  border-radius: 3px;
+  background-color: transparent;
+  color: rgb(175, 167, 167);
+  border: none;
+  cursor: pointer;
+}
+
+button.cancel:hover {
+  background-color: #ddcfcf2d;
 }
