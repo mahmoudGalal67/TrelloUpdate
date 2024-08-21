@@ -1,9 +1,9 @@
-.allboards {
+.workspace {
   margin-top: 45px;
   padding: 0 2%;
 }
 
-.allboards .header {
+.workspace .header {
   padding: 25px 0;
   display: flex;
   justify-content: space-around;
@@ -17,24 +17,24 @@
   gap: 12px;
 }
 
-.allboards .body h2 {
+.workspace .body h2 {
   margin-left: 12%;
   margin-top: 16px;
   margin-bottom: 28px;
 }
 
-.allboards .workspace-item {
+.workspace .workspace-item {
   margin-top: 25px;
 }
 
-.allboards .filters {
+.workspace .filters {
   margin-top: 18px;
   padding: 0 4%;
   display: flex;
   justify-content: space-around;
 }
 
-.allboards .filters .left {
+.workspace .filters .left {
   display: flex;
   gap: 12px;
 }
@@ -60,11 +60,11 @@
   .ivite {
     flex-direction: column;
   }
-  .allboards .filters {
+  .workspace .filters {
     flex-direction: column;
     gap: 18px;
   }
-  .allboards .header {
+  .workspace .header {
     flex-direction: column;
     padding: 12px 0;
   }

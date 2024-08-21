@@ -30,7 +30,7 @@ function Login() {
     try {
       const response = await login(values);
       console.log("Login successful:", response.data.data);
-      Cookies.set("token", response.data.data.token, { expires: 1 });
+      Cookies.set("token", response.data.data.token, { expires: 7 });
       dispatch({ type: "login", payload: response.data.data });
       toast.success("Login successful!");
 

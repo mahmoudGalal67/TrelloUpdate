@@ -123,3 +123,10 @@
   -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.45);
   cursor: pointer;
 }
+
+.boards .board-options {
+  display: flex;
+  color: white;
+  font-size: 22px;
+  margin-bottom: 16px;
+}

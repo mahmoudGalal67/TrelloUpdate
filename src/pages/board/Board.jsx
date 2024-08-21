@@ -1,5 +1,5 @@
 import "../../App.css";
-import "./board.css";
+import "./Board.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../../components/navbar/Navbar";
@@ -53,11 +53,13 @@ function Board() {
     <div className="boards">
       <Navbar />
       <SideBar />
-
       <div className="wrapper">
+        <div className="board-options">
+          <span>{board.board_name}</span>
+        </div>
         <div className="wrapper-lists">
           {board.lists_of_the_board.map((list) => (
-            <List key={list.list_id} list={list} />
+            <List key={list.list_id} list={list} setboard={setboard} />
           ))}
 
           <div className="addList">
@@ -65,7 +67,13 @@ function Board() {
             <button type="text" onClick={() => setShowFormList(true)}>
               Add another list
             </button>
-            {showFormList && <AddList setShowFormList={setShowFormList} />}
+            {showFormList && (
+              <AddList
+                boardId={board.board_id}
+                setShowFormList={setShowFormList}
+                setboard={setboard}
+              />
+            )}
           </div>
         </div>
       </div>

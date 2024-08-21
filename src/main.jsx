@@ -1,12 +1,12 @@
 import "./index.css";
 import "./App.css";
 
-import Workspace from "./pages/wkorkspace/Workspace.jsx";
-import Board from "./pages/board/Board.jsx";
+import Workspaces from "./pages/Workspaces/Workspaces.jsx";
+import Board from "./pages/Board/Board.jsx";
 
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AllBoards from "./pages/allBoards/AllBoards.jsx";
+import WorkSpace from "./pages/WorkSpace/Workspace.jsx";
 import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
 import { Toaster } from "react-hot-toast";
@@ -19,7 +19,7 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <ProtectedRoute>
-        <Workspace />
+        <Workspaces />
       </ProtectedRoute>
     ),
   },
@@ -32,10 +32,10 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/allBoards",
+    path: "/workspace/:workspaceId",
     element: (
       <ProtectedRoute>
-        <AllBoards />
+        <WorkSpace />
       </ProtectedRoute>
     ),
   },

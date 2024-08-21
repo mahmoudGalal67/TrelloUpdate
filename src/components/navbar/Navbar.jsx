@@ -8,14 +8,13 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Cookies from "js-cookie";
 
 import { Link, useLocation, useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 import "./navbar.css";
 import { AuthContext } from "../context/Auth";
 import { useContext, useRef, useState } from "react";
 import api from "../../apiAuth/auth";
 
-function NavBar() {
+function NavBar({ workSpaces }) {
   const [error, seterror] = useState(null);
   const { user } = useContext(AuthContext);
   const workspaceTitle = useRef(null);
@@ -67,7 +66,7 @@ function NavBar() {
   return (
     <Navbar expand="lg">
       <Container>
-        <Navbar.Brand href="#">
+        <Navbar.Brand as={Link} to="/">
           {" "}
           <img
             src="/logo.gif"
@@ -89,21 +88,34 @@ function NavBar() {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            <NavDropdown
-              title={pathName !== "board" ? "Workspaces" : "Boards"}
-              id="navbarScrollingDropdown"
-            >
-              <NavDropdown.Item href="#action3">tes</NavDropdown.Item>
-              <NavDropdown.Item href="#action4">test 1</NavDropdown.Item>
-              <NavDropdown.Item href="#action5">test 2</NavDropdown.Item>
-            </NavDropdown>
-            <NavDropdown title="Recent" id="navbarScrollingDropdown">
-              <NavDropdown.Item href="#action3">tests</NavDropdown.Item>
-              <NavDropdown.Item href="#action4">test 1</NavDropdown.Item>
-              <NavDropdown.Item href="#action5">test 2</NavDropdown.Item>
-              <NavDropdown.Item href="#action6">test 3</NavDropdown.Item>
-            </NavDropdown>
-            {pathName !== "board" ? (
+            {pathName == "" ? (
+              <NavDropdown title="Workspaces" id="navbarScrollingDropdown">
+                {workSpaces.map((workspace) => (
+                  <NavDropdown.Item
+                    key={workspace.workspace_id}
+                    as={Link}
+                    to={`/workspace/${workspace.workspace_id}`}
+                  >
+                    {workspace.workspace_name}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
+            ) : (
+              ""
+            )}
+
+            {pathName == "board" && (
+              <NavDropdown
+                title="Invite Board Members"
+                id="navbarScrollingDropdown"
+              >
+                <NavDropdown.Item href="#action3">tests</NavDropdown.Item>
+                <NavDropdown.Item href="#action4">test 1</NavDropdown.Item>
+                <NavDropdown.Item href="#action5">test 2</NavDropdown.Item>
+                <NavDropdown.Item href="#action6">test 3</NavDropdown.Item>
+              </NavDropdown>
+            )}
+            {pathName !== "board" && pathName !== "workspace" ? (
               <NavDropdown
                 title="Create Workspace"
                 id="navbarScrollingDropdown"
