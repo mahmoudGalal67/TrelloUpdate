@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://dev.alyoumsa.com/api",
+export const api = axios.create({
+  baseURL: "https://back.alyoumsa.com/public/api",
   headers: {
     "Content-Type": "application/json",
   },

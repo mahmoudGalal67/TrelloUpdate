@@ -9,8 +9,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AllBoards from "./pages/allBoards/AllBoards.jsx";
 import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
-import { Toaster } from "react-hot-toast"; // استيراد Toaster
+import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+
+import { AuthContextProvider } from "./components/context/Auth.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +24,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/board",
+    path: "/board/:workspaceId/:boardId",
     element: (
       <ProtectedRoute>
         <Board />
@@ -48,7 +50,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <>
+  <AuthContextProvider>
     <RouterProvider router={router} />
     <Toaster
       position="top-center"
@@ -70,5 +72,5 @@ createRoot(document.getElementById("root")).render(
         },
       }}
     />
-  </>
+  </AuthContextProvider>
 );

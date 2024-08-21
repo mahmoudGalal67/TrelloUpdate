@@ -4,16 +4,14 @@ import CloseButton from "react-bootstrap/CloseButton";
 import { useState } from "react";
 import Card from "../card/Card";
 
-const cards = [1, 2, 3, , 4, 5];
-
-function List() {
+function List({ list }) {
   const [showCardList, setshowCardList] = useState(false);
   return (
     <div className="list">
-      <h3>test</h3>
+      <h3>{list.list_title}</h3>
       <div className="wrapper">
-        {cards.map((item) => (
-          <Card id={item} />
+        {list.cards_of_the_list.map((card) => (
+          <Card key={card.card_id} card={card} />
         ))}
 
         <div className="addList addListCard">

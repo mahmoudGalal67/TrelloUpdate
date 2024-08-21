@@ -108,3 +108,8 @@ button.cancel {
 button.cancel:hover {
   background-color: #ddcfcf2d;
 }
+
+.err {
+  color: rgb(189, 53, 53);
+  text-align: center;
+}

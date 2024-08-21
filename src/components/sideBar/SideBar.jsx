@@ -14,7 +14,7 @@ function SideBar() {
   return (
     <>
       <Button className="sideNav-link" variant="primary" onClick={handleShow}>
-        <img src="rightArrow.svg" alt="" />
+        <img src="/rightArrow.svg" alt="" />
       </Button>
 
       <div className="side-bar"></div>

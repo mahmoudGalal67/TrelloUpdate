@@ -5,19 +5,64 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 
-import { Link, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import "./navbar.css";
+import { AuthContext } from "../context/Auth";
+import { useContext, useRef, useState } from "react";
+import api from "../../apiAuth/auth";
 
 function NavBar() {
+  const [error, seterror] = useState(null);
+  const { user } = useContext(AuthContext);
+  const workspaceTitle = useRef(null);
+  const boardTitle = useRef(null);
+
   const location = useLocation();
   const path = location.pathname;
-  const navigate = useNavigate();
+  const pathName = path.split("/")[1];
 
-  const addWorkspace = (e) => {
+  const cookies = Cookies.get("token");
+
+  const { workspaceId } = useParams();
+
+  const addBoard = async (e) => {
     e.preventDefault();
-    navigate(0);
+    try {
+      const { data } = await api({
+        url: "/boards/create",
+        method: "post",
+        headers: { Authorization: `Bearer ${cookies}` },
+        data: {
+          name: boardTitle.current.value,
+          workspace_id: workspaceId,
+          photo: "",
+        },
+      });
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      seterror(err.response?.data?.message);
+    }
+  };
+
+  const addWorkspace = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await api({
+        url: "/workspaces/create",
+        method: "post",
+        headers: { Authorization: `Bearer ${cookies}` },
+        data: { name: workspaceTitle.current.value },
+      });
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      seterror(err.response?.data?.message);
+    }
   };
   return (
     <Navbar expand="lg">
@@ -25,7 +70,7 @@ function NavBar() {
         <Navbar.Brand href="#">
           {" "}
           <img
-            src="logo.gif"
+            src="/logo.gif"
             style={{
               backgroundColor: "#0B5ED7",
               width: "80px",
@@ -45,7 +90,7 @@ function NavBar() {
             navbarScroll
           >
             <NavDropdown
-              title={path !== "/board" ? "Workspaces" : "Boards"}
+              title={pathName !== "board" ? "Workspaces" : "Boards"}
               id="navbarScrollingDropdown"
             >
               <NavDropdown.Item href="#action3">tes</NavDropdown.Item>
@@ -58,7 +103,7 @@ function NavBar() {
               <NavDropdown.Item href="#action5">test 2</NavDropdown.Item>
               <NavDropdown.Item href="#action6">test 3</NavDropdown.Item>
             </NavDropdown>
-            {path !== "/board" ? (
+            {pathName !== "board" ? (
               <NavDropdown
                 title="Create Workspace"
                 id="navbarScrollingDropdown"
@@ -68,11 +113,12 @@ function NavBar() {
                   <h2>Workspace</h2>
                   <div className="input-wrapper">
                     <label htmlFor="">Workspace title *</label>
-                    <input type="text" required />
+                    <input ref={workspaceTitle} type="text" required />
                   </div>
                   <Button type="submit" variant="primary">
                     Create Workspace
                   </Button>
+                  {error && <span className="err">{error}</span>}
                 </form>
               </NavDropdown>
             ) : (
@@ -81,13 +127,15 @@ function NavBar() {
                 id="navbarScrollingDropdown"
                 className="create"
               >
-                <form className="container" onSubmit={addWorkspace}>
+                <form className="container" onSubmit={addBoard}>
                   <h2>Board</h2>
                   <div className="input-wrapper">
                     <label htmlFor="">Board title *</label>
-                    <input type="text" required />
+                    <input ref={boardTitle} type="text" required />
                   </div>
-                  <Button variant="primary">Create Board</Button>
+                  <Button type="submit" variant="primary">
+                    Create Board
+                  </Button>
                 </form>
               </NavDropdown>
             )}
@@ -99,13 +147,17 @@ function NavBar() {
               className="me-2"
               aria-label="Search"
             />
-            <Link to="/login">
-              <img
-                src="avatar.jpg"
-                alt=""
-                style={{ width: "40px", height: "40px" }}
-              />
-            </Link>
+            {user ? (
+              <div className="user-name">{Array.from(user.name)[0]}</div>
+            ) : (
+              <Link to="/login">
+                <img
+                  src="/avatar.jpg"
+                  alt=""
+                  style={{ width: "40px", height: "40px" }}
+                />
+              </Link>
+            )}
           </Form>
         </Navbar.Collapse>
       </Container>

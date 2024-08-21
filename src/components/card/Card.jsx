@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "./card.css";
 import CardDetails from "../CardDetails/CardDetails";
 
-function Card({ id }) {
+function Card({ card }) {
   const [open, setOpen] = useState(false);
 
   const onOpenModal = () => setOpen(true);
@@ -11,9 +11,9 @@ function Card({ id }) {
   return (
     <>
       <div className="item" onClick={onOpenModal}>
-        {id} card
+        {card.card_text}
       </div>
-      <CardDetails id={id} onCloseModal={onCloseModal} open={open} />
+      <CardDetails id={card.card_id} onCloseModal={onCloseModal} open={open} />
     </>
   );
 }
