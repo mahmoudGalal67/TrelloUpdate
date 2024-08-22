@@ -2,7 +2,7 @@ import "./index.css";
 import "./App.css";
 
 import Workspaces from "./pages/Workspaces/Workspaces.jsx";
-import Board from "./pages/Board/Board.jsx";
+import Board from "./pages/board/Board.jsx";
 
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -11,6 +11,7 @@ import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import AllBoards from "./pages/allBoards/AllBoards.jsx";
 
 import { AuthContextProvider } from "./components/context/Auth.jsx";
 
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <WorkSpace />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/Allboards",
+    element: (
+      <ProtectedRoute>
+        <AllBoards />
       </ProtectedRoute>
     ),
   },

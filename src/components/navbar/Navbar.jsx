@@ -1,21 +1,19 @@
+import { useEffect, useState, useContext, useRef } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-
 import Cookies from "js-cookie";
-
-import { Link, useLocation, useParams } from "react-router-dom";
-
-import "./navbar.css";
-import { AuthContext } from "../context/Auth";
-import { useContext, useRef, useState } from "react";
 import api from "../../apiAuth/auth";
+import { AuthContext } from "../context/Auth";
+import "./navbar.css";
 
 function NavBar({ workSpaces }) {
-  const [error, seterror] = useState(null);
+  const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
   const { user } = useContext(AuthContext);
   const workspaceTitle = useRef(null);
   const boardTitle = useRef(null);
@@ -25,8 +23,23 @@ function NavBar({ workSpaces }) {
   const pathName = path.split("/")[1];
 
   const cookies = Cookies.get("token");
+  const { workspaceId, boardId } = useParams(); 
 
-  const { workspaceId } = useParams();
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await api.get("/users/get-users", {
+          headers: { Authorization: `Bearer ${cookies}` },
+        });
+        setUsers(data.data);
+      } catch (err) {
+        console.log(err);
+        setError(err.response?.data?.message);
+      }
+    };
+
+    fetchUsers();
+  }, [cookies]);
 
   const addBoard = async (e) => {
     e.preventDefault();
@@ -44,10 +57,10 @@ function NavBar({ workSpaces }) {
       window.location.reload();
     } catch (err) {
       console.log(err);
-      seterror(err.response?.data?.message);
+      setError(err.response?.data?.message);
     }
   };
-
+  
   const addWorkspace = async (e) => {
     e.preventDefault();
     try {
@@ -60,14 +73,39 @@ function NavBar({ workSpaces }) {
       window.location.reload();
     } catch (err) {
       console.log(err);
-      seterror(err.response?.data?.message);
+      setError(err.response?.data?.message);
     }
   };
+  
+
+   // Error in the response 
+  const inviteUserToBoard = async (userId , email) => {
+    try {
+      console.log('Inviting user:', userId, 'to board:', boardId);
+      
+      const { data } = await api({
+        url: "/boards/assign-user-to-board",
+        method: "post",
+        headers: { Authorization: `Bearer ${cookies}` },
+        data: {
+          board_id: boardId, 
+          user_id: userId,
+          email: email,
+        },
+      });
+  
+      alert(`User ${userId} has been invited!`);
+    } catch (err) {
+      console.error('API error:', err);
+      console.error('Response data:', err.response?.data);
+      setError(err.response?.data?.message || 'An unexpected error occurred');
+    }
+  };
+
   return (
     <Navbar expand="lg">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          {" "}
           <img
             src="/logo.gif"
             style={{
@@ -88,7 +126,7 @@ function NavBar({ workSpaces }) {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            {pathName == "" ? (
+            {pathName === "" ? (
               <NavDropdown title="Workspaces" id="navbarScrollingDropdown">
                 {workSpaces.map((workspace) => (
                   <NavDropdown.Item
@@ -104,15 +142,19 @@ function NavBar({ workSpaces }) {
               ""
             )}
 
-            {pathName == "board" && (
+            {pathName === "board" && (
               <NavDropdown
                 title="Invite Board Members"
                 id="navbarScrollingDropdown"
               >
-                <NavDropdown.Item href="#action3">tests</NavDropdown.Item>
-                <NavDropdown.Item href="#action4">test 1</NavDropdown.Item>
-                <NavDropdown.Item href="#action5">test 2</NavDropdown.Item>
-                <NavDropdown.Item href="#action6">test 3</NavDropdown.Item>
+                {users.map((user) => (
+                  <NavDropdown.Item
+                    key={user.id}
+                    onClick={() => inviteUserToBoard(user.id,user.email)}
+                  >
+                    {user.name}
+                  </NavDropdown.Item>
+                ))}
               </NavDropdown>
             )}
             {pathName !== "board" && pathName !== "workspace" ? (
@@ -178,3 +220,6 @@ function NavBar({ workSpaces }) {
 }
 
 export default NavBar;
+
+
+
