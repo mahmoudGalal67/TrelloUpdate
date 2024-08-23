@@ -16,6 +16,7 @@ function Workspace() {
   const [workSpaces, setworkSpaces] = useState([]);
   const [editingBoardId, setEditingBoardId] = useState(null); 
   const [editedBoardName, setEditedBoardName] = useState(""); 
+  const [editedBoardPhoto, setEditedBoardPhoto] = useState(null); 
   const [showModal, setShowModal] = useState(false);
 
   const cookies = Cookies.get("token");
@@ -37,19 +38,27 @@ function Workspace() {
     getWorkSpaces();
   }, [cookies]);
 
-  const handleEditClick = (board_id, currentBoardName) => {
+  const handleEditClick = (board_id, currentBoardName, currentBoardPhoto) => {
     setEditingBoardId(board_id);
     setEditedBoardName(currentBoardName);
+    setEditedBoardPhoto(currentBoardPhoto); 
     setShowModal(true); 
   };
 
   const handleSaveClick = async (workspace_id, board_id) => {
     try {
+      const formData = new FormData();
+      formData.append("workspace_id", workspace_id);
+      formData.append("name", editedBoardName);
+      if (editedBoardPhoto) {
+        formData.append("photo", editedBoardPhoto);
+      }
+
       const response = await api({
-        url: `/api/boards/update-board-name/${board_id}`, 
-        method: "PUT",
+        url: `/boards/update/${board_id}`, 
+        method: "POST", 
         headers: { Authorization: `Bearer ${cookies}` },
-        data: { board_name: editedBoardName },
+        data: formData, 
       });
 
       setworkSpaces((prevWorkspaces) =>
@@ -60,7 +69,7 @@ function Workspace() {
                 boards_of_the_workspace: workspace.boards_of_the_workspace.map(
                   (board) =>
                     board.board_id === board_id
-                      ? { ...board, board_name: editedBoardName }
+                      ? { ...board, board_name: editedBoardName, imageUrl: response.data.imageUrl } // Update imageUrl
                       : board
                 ),
               }
@@ -70,6 +79,7 @@ function Workspace() {
 
       setEditingBoardId(null);
       setEditedBoardName("");
+      setEditedBoardPhoto(null); 
       setShowModal(false);
     } catch (error) {
       console.log("Error updating board name:", error);
@@ -79,6 +89,7 @@ function Workspace() {
   const handleCancelEdit = () => {
     setEditingBoardId(null);
     setEditedBoardName("");
+    setEditedBoardPhoto(null); 
     setShowModal(false); 
   };
 
@@ -104,7 +115,7 @@ function Workspace() {
               {workspace.boards_of_the_workspace.map((board) => (
                 <div className="board-container" key={board.board_id}>
                   {/* ${board.imageUrl} */}
-                  <div className="card" style={{ backgroundImage: `url("photo-1719825718360-7de63c92135f.webp")` }}>
+                  <div className="card" style={{ backgroundImage: `url('photo-1719825718360-7de63c92135f.webp')` }}> 
                     <div className="card-content">
                       <Link
                         className="board-link"
@@ -115,7 +126,7 @@ function Workspace() {
                       <Button
                         variant="primary"
                         onClick={() =>
-                          handleEditClick(board.board_id, board.board_name)
+                          handleEditClick(board.board_id, board.board_name, board.imageUrl) // Pass imageUrl
                         }
                         className="edit-button"
                       >
@@ -141,6 +152,13 @@ function Workspace() {
               value={editedBoardName}
               onChange={(e) => setEditedBoardName(e.target.value)}
               placeholder="Enter new board name"
+            />
+          </Form.Group>
+          <Form.Group controlId="formBoardPhoto">
+            <Form.Label>Board Photo</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setEditedBoardPhoto(e.target.files[0])}
             />
           </Form.Group>
         </Modal.Body>

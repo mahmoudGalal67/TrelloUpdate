@@ -13,6 +13,84 @@ import api from "../../apiAuth/auth";
 import Spinner from "react-bootstrap/esm/Spinner";
 
 function MyVerticallyCenteredModal(props) {
+  const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const { workspaceId } = useParams();
+  const cookies = Cookies.get("token");
+  console.log("Workspace ID from params:", workspaceId);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await api.get("/users/get-users", {
+          headers: { Authorization: `Bearer ${cookies}` },
+        });
+        setUsers(data.data);
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || "Failed to fetch users");
+      }
+    };
+
+    fetchUsers();
+  }, [cookies]);
+
+  const handleInvite = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (selectedUsers.length === 0) {
+      setError("Please select at least one user");
+      return;
+    }
+
+    try {
+      console.log(
+        "Inviting user:",
+        selectedUsers,
+        "to workspace:",
+        workspaceId
+      );
+      await api.post(
+        "/workspaces/assign-user-to-workspace",
+        {
+          workspace_id: workspaceId,
+          user_id: selectedUsers.map((userId) => parseInt(userId)),
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies}` },
+        }
+      );
+      alert("User(s) successfully assigned to the workspace!");
+      props.onHide();
+    } catch (err) {
+      console.error("API error:", err);
+      const responseMessage = err.response?.data?.message;
+      const errorMessage = responseMessage || "An unexpected error occurred";
+
+      if (err.response?.status === 422) {
+        if (responseMessage.includes("already a member")) {
+          alert("One or more users are already members of this workspace.");
+        } else {
+          setError(`Validation Error: ${errorMessage}`);
+        }
+      } else if (err.response?.status === 400) {
+        setError(`Bad Request: ${errorMessage}`);
+      } else {
+        setError(errorMessage);
+      }
+    }
+  };
+
+  const handleUserSelect = (event) => {
+    const value = Array.from(
+      event.target.selectedOptions,
+      (option) => option.value
+    );
+    setSelectedUsers(value);
+  };
+
   return (
     <Modal
       {...props}
@@ -25,12 +103,25 @@ function MyVerticallyCenteredModal(props) {
           Invite to Workspace
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Form.Control
-          size="md"
-          type="text"
-          placeholder="Email address or name"
-        />
+      <label value="" style={{fontSize:"18px",marginLeft:"20px",marginTop:"25px"}}>Select users...</label>
+      <Modal.Body>  
+        <Form style={{marginTop:"-10px"}}>
+          <Form.Group controlId="userSelect">
+            <Form.Label>Select Users</Form.Label>
+            <Form.Select
+              multiple
+              aria-label="Select users"
+              onChange={handleUserSelect}
+            >
+            
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Form>
         <div className="ivite">
           <p>Invite someone to this Workspace with a link:</p>
           <a href="#">
@@ -38,13 +129,16 @@ function MyVerticallyCenteredModal(props) {
             Create Link
           </a>
         </div>
+        {error && <p className="error">{error}</p>}
       </Modal.Body>
       <Modal.Footer>
+        <Button onClick={handleInvite}>Invite</Button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   );
 }
+
 function Workspace() {
   const [modalShow, setModalShow] = useState(false);
   const [loading, setLoading] = useState(true);

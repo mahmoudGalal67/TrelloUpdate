@@ -17,6 +17,8 @@ function NavBar({ workSpaces }) {
   const { user } = useContext(AuthContext);
   const workspaceTitle = useRef(null);
   const boardTitle = useRef(null);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
 
   const location = useLocation();
   const path = location.pathname;
@@ -24,6 +26,7 @@ function NavBar({ workSpaces }) {
 
   const cookies = Cookies.get("token");
   const { workspaceId, boardId } = useParams(); 
+  console.log("Board ID from params:", boardId);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -77,28 +80,37 @@ function NavBar({ workSpaces }) {
     }
   };
   
-
-   // Error in the response 
-  const inviteUserToBoard = async (userId , email) => {
+  const handleUserClick = async (userId) => {
     try {
-      console.log('Inviting user:', userId, 'to board:', boardId);
-      
-      const { data } = await api({
-        url: "/boards/assign-user-to-board",
-        method: "post",
-        headers: { Authorization: `Bearer ${cookies}` },
-        data: {
-          board_id: boardId, 
-          user_id: userId,
-          email: email,
-        },
-      });
+      console.log("Assigning user:", userId, "to board:", boardId);
   
-      alert(`User ${userId} has been invited!`);
+      await api.post(
+        "/boards/assign-user-to-board",
+        {
+          board_id: boardId,
+          user_id: [userId], 
+        },
+        {
+          headers: { Authorization: `Bearer ${cookies}` },
+        }
+      );
+      alert("User successfully assigned to the board!");
     } catch (err) {
-      console.error('API error:', err);
-      console.error('Response data:', err.response?.data);
-      setError(err.response?.data?.message || 'An unexpected error occurred');
+      console.error("API error:", err);
+      const responseMessage = err.response?.data?.message;
+      const errorMessage = responseMessage || "An unexpected error occurred";
+  
+      if (err.response?.status === 422) {
+        if (responseMessage.includes("already a member")) {
+          alert("This user is already a member of this board.");
+        } else {
+          setError(`Validation Error: ${errorMessage}`);
+        }
+      } else if (err.response?.status === 400) {
+        setError(`Bad Request: ${errorMessage}`);
+      } else {
+        setError(errorMessage);
+      }
     }
   };
 
@@ -142,7 +154,7 @@ function NavBar({ workSpaces }) {
               ""
             )}
 
-            {pathName === "board" && (
+          {pathName === "board" && (
               <NavDropdown
                 title="Invite Board Members"
                 id="navbarScrollingDropdown"
@@ -150,7 +162,7 @@ function NavBar({ workSpaces }) {
                 {users.map((user) => (
                   <NavDropdown.Item
                     key={user.id}
-                    onClick={() => inviteUserToBoard(user.id,user.email)}
+                    onClick={() => handleUserClick(user.id)}
                   >
                     {user.name}
                   </NavDropdown.Item>
