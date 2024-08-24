@@ -58,8 +58,10 @@ function Board() {
           <span>{board.board_name}</span>
         </div>
         <div className="wrapper-lists">
+          
           {board.lists_of_the_board.map((list) => (
             <List key={list.list_id} list={list} setboard={setboard} />
+            
           ))}
 
           <div className="addList">

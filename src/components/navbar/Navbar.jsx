@@ -18,6 +18,7 @@ function NavBar({ workSpaces }) {
   const workspaceTitle = useRef(null);
   const boardTitle = useRef(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  // const [assignedUsers, setAssignedUsers] = useState([]);
 
 
   const location = useLocation();
@@ -113,6 +114,78 @@ function NavBar({ workSpaces }) {
       }
     }
   };
+
+         
+  //  Toggle user assignment 
+//   const fetchAssignedUsers = async () => {
+//     try {
+                 // Assign users endpoint
+//       const { data } = await api.get(``, {
+//         headers: { Authorization: `Bearer ${cookies}` },
+//       });
+//       setAssignedUsers(data.data);
+//     } catch (err) {
+//       console.log(err);
+//       setError(err.response?.data?.message);
+//     }
+//   };
+
+//   if (boardId) {
+//     fetchAssignedUsers();
+//   }
+//   fetchUsers();
+// }, [cookies, boardId]);
+
+// const handleUserClick = async (userId) => {
+//   try {
+//     if (assignedUsers.some(user => user.id === userId)) {
+//       // User is already assigned, so remove them
+//       await api.post(
+//         "/boards/remove-user-from-board",
+//         {
+//           board_id: boardId,
+//           user_id: userId,
+//         },
+//         {
+//           headers: { Authorization: `Bearer ${cookies}` },
+//         }
+//       );
+//       setAssignedUsers(assignedUsers.filter(user => user.id !== userId));
+//       alert("User successfully removed from the board!");
+//     } else {
+//       // User is not assigned, so add them
+//       await api.post(
+//         "/boards/assign-user-to-board",
+//         {
+//           board_id: boardId,
+//           user_id: [userId], 
+//         },
+//         {
+//           headers: { Authorization: `Bearer ${cookies}` },
+//         }
+//       );
+//       setAssignedUsers([...assignedUsers, { id: userId }]); // Update state with new user
+//       alert("User successfully assigned to the board!");
+//     }
+//   } catch (err) {
+//     console.error("API error:", err);
+//     const responseMessage = err.response?.data?.message;
+//     const errorMessage = responseMessage || "An unexpected error occurred";
+
+//     if (err.response?.status === 422) {
+//       if (responseMessage.includes("already a member")) {
+//         alert("This user is already a member of this board.");
+//       } else {
+//         setError(`Validation Error: ${errorMessage}`);
+//       }
+//     } else if (err.response?.status === 400) {
+//       setError(`Bad Request: ${errorMessage}`);
+//     } else {
+//       setError(errorMessage);
+//     }
+//   }
+// };
+
 
   return (
     <Navbar expand="lg">

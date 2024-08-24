@@ -10,6 +10,7 @@ import api from "../../apiAuth/auth";
 function List({ list, setboard }) {
   const [showCardList, setshowCardList] = useState(false);
   const [error, seterror] = useState(null);
+  const [cards, setCards] = useState([]);
 
   const cardTitle = useRef(null);
 
@@ -57,12 +58,61 @@ function List({ list, setboard }) {
     }
   };
 
+
+  const handleCardDelete = async (cardId) => {
+    try {
+      await api({
+        url: `/cards/destroy/${cardId}`,
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${cookies}` },
+      });
+  
+      setboard((prev) => ({
+        ...prev,
+        lists_of_the_board: prev.lists_of_the_board.map((item) => {
+          if (item.list_id === list.list_id) {
+            return {
+              ...item,
+              cards_of_the_list: item.cards_of_the_list.filter(
+                (card) => card.card_id !== cardId
+              ),
+            };
+          }
+          return item;
+        }),
+      }));
+    } catch (err) {
+      console.log(err);
+      seterror(err.response?.data?.message);
+    }
+  };
+  
+  const updateCardCoverImage = (cardId, coverImageUrl) => {
+    setboard((prev) => ({
+      ...prev,
+      lists_of_the_board: prev.lists_of_the_board.map((item) => {
+        if (item.list_id === list.list_id) {
+          return {
+            ...item,
+            cards_of_the_list: item.cards_of_the_list.map((card) =>
+              card.card_id === cardId
+                ? { ...card, photo_url: coverImageUrl }
+                : card
+            ),
+          };
+        }
+        return item;
+      }),
+    }));
+  };
+  
+
   return (
     <div className="list">
       <h3>{list.list_title}</h3>
       <div className="wrapper">
         {list.cards_of_the_list.map((card) => (
-          <Card key={card.card_id} card={card} />
+          <Card key={card.card_id} card={card} onCardDelete={handleCardDelete}  updateCardCoverImage={updateCardCoverImage}/>
         ))}
 
         <div className="addList addListCard">

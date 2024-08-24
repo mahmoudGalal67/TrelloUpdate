@@ -8,16 +8,18 @@ import Cookies from "js-cookie";
 import Spinner from "react-bootstrap/Spinner";
 import api from "../../apiAuth/auth";
 import { Modal, Button, Form } from "react-bootstrap";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function Workspace() {
   const [loading, setLoading] = useState(true);
   const [workSpaces, setworkSpaces] = useState([]);
-  const [editingBoardId, setEditingBoardId] = useState(null); 
-  const [editedBoardName, setEditedBoardName] = useState(""); 
-  const [editedBoardPhoto, setEditedBoardPhoto] = useState(null); 
+  const [editingBoardId, setEditingBoardId] = useState(null);
+  const [editedBoardName, setEditedBoardName] = useState("");
+  const [editedBoardPhoto, setEditedBoardPhoto] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editingWorkspaceId, setEditingWorkspaceId] = useState(null);
+  const [editedWorkspaceName, setEditedWorkspaceName] = useState("");
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
 
   const cookies = Cookies.get("token");
 
@@ -38,11 +40,12 @@ function Workspace() {
     getWorkSpaces();
   }, [cookies]);
 
+  // edit and delete board
   const handleEditClick = (board_id, currentBoardName, currentBoardPhoto) => {
     setEditingBoardId(board_id);
     setEditedBoardName(currentBoardName);
-    setEditedBoardPhoto(currentBoardPhoto); 
-    setShowModal(true); 
+    setEditedBoardPhoto(currentBoardPhoto);
+    setShowModal(true);
   };
 
   const handleSaveClick = async (workspace_id, board_id) => {
@@ -55,10 +58,10 @@ function Workspace() {
       }
 
       const response = await api({
-        url: `/boards/update/${board_id}`, 
-        method: "POST", 
+        url: `/boards/update/${board_id}`,
+        method: "POST",
         headers: { Authorization: `Bearer ${cookies}` },
-        data: formData, 
+        data: formData,
       });
 
       setworkSpaces((prevWorkspaces) =>
@@ -69,7 +72,11 @@ function Workspace() {
                 boards_of_the_workspace: workspace.boards_of_the_workspace.map(
                   (board) =>
                     board.board_id === board_id
-                      ? { ...board, board_name: editedBoardName, imageUrl: response.data.imageUrl } // Update imageUrl
+                      ? {
+                          ...board,
+                          board_name: editedBoardName,
+                          board_background: response.data.board_background,
+                        } // Update imageUrl
                       : board
                 ),
               }
@@ -79,7 +86,7 @@ function Workspace() {
 
       setEditingBoardId(null);
       setEditedBoardName("");
-      setEditedBoardPhoto(null); 
+      setEditedBoardPhoto(null);
       setShowModal(false);
     } catch (error) {
       console.log("Error updating board name:", error);
@@ -89,8 +96,89 @@ function Workspace() {
   const handleCancelEdit = () => {
     setEditingBoardId(null);
     setEditedBoardName("");
-    setEditedBoardPhoto(null); 
-    setShowModal(false); 
+    setEditedBoardPhoto(null);
+    setShowModal(false);
+  };
+
+  const handleDeleteClick = async (workspace_id, board_id) => {
+    if (window.confirm("Are you sure you want to delete this board?")) {
+      try {
+        await api({
+          url: `/boards/destroy/${board_id}`,
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${cookies}` },
+        });
+
+        setworkSpaces((prevWorkspaces) =>
+          prevWorkspaces.map((workspace) =>
+            workspace.workspace_id === workspace_id
+              ? {
+                  ...workspace,
+                  boards_of_the_workspace:
+                    workspace.boards_of_the_workspace.filter(
+                      (board) => board.board_id !== board_id
+                    ),
+                }
+              : workspace
+          )
+        );
+      } catch (error) {
+        console.log("Error deleting board:", error);
+      }
+    }
+  };
+
+  // edit and delete workspace
+
+  const handleSaveWorkspaceClick = async () => {
+    try {
+      const response = await api({
+        url: `/workspaces/update`,
+        method: "POST",
+        headers: { Authorization: `Bearer ${cookies}` },
+        data: { workspace_id: editingWorkspaceId, name: editedWorkspaceName },
+      });
+
+      setworkSpaces((prevWorkspaces) =>
+        prevWorkspaces.map((workspace) =>
+          workspace.workspace_id === editingWorkspaceId
+            ? { ...workspace, workspace_name: editedWorkspaceName }
+            : workspace
+        )
+      );
+
+      setEditingWorkspaceId(null);
+      setEditedWorkspaceName("");
+      setShowWorkspaceModal(false);
+    } catch (error) {
+      console.log("Error updating workspace name:", error);
+    }
+  };
+
+  const handleEditWorkspaceClick = (workspace_id, currentWorkspaceName) => {
+    setEditingWorkspaceId(workspace_id);
+    setEditedWorkspaceName(currentWorkspaceName);
+    setShowWorkspaceModal(true);
+  };
+
+  const handleDeleteWorkspaceClick = async (workspace_id) => {
+    if (window.confirm("Are you sure you want to delete this workspace?")) {
+      try {
+        await api({
+          url: `/workspaces/destroy/${workspace_id}`,
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${cookies}` },
+        });
+
+        setworkSpaces((prevWorkspaces) =>
+          prevWorkspaces.filter(
+            (workspace) => workspace.workspace_id !== workspace_id
+          )
+        );
+      } catch (error) {
+        console.log("Error deleting workspace:", error);
+      }
+    }
   };
 
   if (loading) {
@@ -110,12 +198,44 @@ function Workspace() {
       <div className="views">
         {workSpaces.map((workspace) => (
           <div className="workspace-item" key={workspace.workspace_id}>
-            <h2>{workspace.workspace_name}</h2>
+            <div className="d-flex justify-content-between mb-5">
+              <div>
+                <h2>{workspace.workspace_name}</h2>
+              </div>
+              <div>
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    handleEditWorkspaceClick(
+                      workspace.workspace_id,
+                      workspace.name
+                    )
+                  }
+                  className="edit-workspace-button ms-2"
+                >
+                  <i className="fa-regular fa-pen-to-square"></i>
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() =>
+                    handleDeleteWorkspaceClick(workspace.workspace_id)
+                  }
+                  className="delete-workspace-button ms-2"
+                >
+                  <i className="fa-regular fa-trash-can"></i>
+                </Button>
+              </div>
+            </div>
             <div className="wrapper">
               {workspace.boards_of_the_workspace.map((board) => (
                 <div className="board-container" key={board.board_id}>
-                  {/* ${board.imageUrl} */}
-                  <div className="card" style={{ backgroundImage: `url('photo-1719825718360-7de63c92135f.webp')` }}> 
+                  {/* ${board.board_background} */}
+                  <div
+                    className="card"
+                    style={{
+                      backgroundImage: `url('photo-1719825718360-7de63c92135f.webp')`,
+                    }}
+                  >
                     <div className="card-content">
                       <Link
                         className="board-link"
@@ -125,12 +245,29 @@ function Workspace() {
                       </Link>
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          handleEditClick(board.board_id, board.board_name, board.imageUrl) // Pass imageUrl
+                        onClick={
+                          () =>
+                            handleEditClick(
+                              board.board_id,
+                              board.board_name,
+                              board.board_background
+                            ) // Pass imageUrl
                         }
                         className="edit-button"
                       >
                         <i className="fa-regular fa-pen-to-square"></i>
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() =>
+                          handleDeleteClick(
+                            workspace.workspace_id,
+                            board.board_id
+                          )
+                        }
+                        className="delete-button ms-2"
+                      >
+                        <i className="fa-regular fa-trash-can"></i>
                       </Button>
                     </div>
                   </div>
@@ -179,6 +316,37 @@ function Workspace() {
               )
             }
           >
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showWorkspaceModal}
+        onHide={() => setShowWorkspaceModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Workspace Name</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="formWorkspaceName">
+            <Form.Label>Workspace Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={editedWorkspaceName}
+              onChange={(e) => setEditedWorkspaceName(e.target.value)}
+              placeholder="Enter new workspace name"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowWorkspaceModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSaveWorkspaceClick}>
             Save Changes
           </Button>
         </Modal.Footer>

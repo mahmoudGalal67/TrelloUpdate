@@ -25,9 +25,17 @@
   z-index: 1; 
 }
 
-.edit-button {
+.edit-button  {
   z-index: 1; 
+  margin-left:120px;
+  background:none !important;
+  border:none !important;
 }
+.delete-button{
+  background:none !important;
+  border:none !important;
+}
+
 
 
 
