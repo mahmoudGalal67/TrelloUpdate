@@ -204,12 +204,12 @@ function Workspace() {
                 <h2>{workspace.workspace_name}</h2>
               </div>
               <div>
-              <Dropdown>
-              <Dropdown.Toggle
+                <Dropdown>
+                  <Dropdown.Toggle
                     as="button"
-                    className="custom-dropdown-toggle p-0 text-dark no-caret"
+                    className="custom-dropdown-toggle p-0 no-caret"
                   >
-                    <span className="vertical-dots">⋮</span>
+                    <span className="vertical-dots" style={{backgroundColor:"#fff"}}>⋮</span>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Item
@@ -251,32 +251,40 @@ function Workspace() {
                       >
                         <p className="board-name">{board.board_name}</p>
                       </Link>
-                      <Button
-                        variant="primary"
-                        onClick={
-                          () =>
-                            handleEditClick(
-                              board.board_id,
-                              board.board_name,
-                              board.board_background
-                            ) // Pass imageUrl
-                        }
-                        className="edit-button"
-                      >
-                        <i className="fa-regular fa-pen-to-square"></i>
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() =>
-                          handleDeleteClick(
-                            workspace.workspace_id,
-                            board.board_id
-                          )
-                        }
-                        className="delete-button ms-2"
-                      >
-                        <i className="fa-regular fa-trash-can"></i>
-                      </Button>
+                      <Dropdown>
+                        <Dropdown.Toggle
+                          as="button"
+                          className="custom-dropdown-toggle p-0 no-caret"
+                        >
+                          <span className="vertical-dots"style={{ color: 'white' }} >⋮</span>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item
+                            onClick={() =>
+                              handleEditClick(
+                                board.board_id,
+                                board.board_name,
+                                board.board_background
+                              )
+                            }
+                          >
+                            <i className="fa-regular fa-pen-to-square me-2"></i>{" "}
+                            Edit
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() =>
+                              handleDeleteClick(
+                                workspace.workspace_id,
+                                board.board_id
+                              )
+                            }
+                            className="text-danger"
+                          >
+                            <i className="fa-regular fa-trash-can me-2"></i>{" "}
+                            Delete
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
                     </div>
                   </div>
                 </div>
