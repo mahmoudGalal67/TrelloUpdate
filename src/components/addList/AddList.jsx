@@ -23,12 +23,13 @@ function addList({ setShowFormList, boardId, setboard }) {
           board_id: boardId,
         },
       });
+  
       setboard((prev) => ({
         ...prev,
         lists_of_the_board: [
           ...prev.lists_of_the_board,
           {
-            list_id: data.data.id,
+            list_id: data.data.id, // Ensure this ID is correct
             list_title: data.data.title,
             cards_of_the_list: [],
           },
@@ -36,12 +37,12 @@ function addList({ setShowFormList, boardId, setboard }) {
       }));
       setShowFormList(false);
       listTitle.current.value = "";
-      // window.location.reload();
     } catch (err) {
       console.log(err);
       seterror(err.response?.data?.message);
     }
   };
+  
   return (
     <div className="addListForm">
       <form onSubmit={addList}>

@@ -60,7 +60,7 @@ function Board() {
         <div className="wrapper-lists">
           
           {board.lists_of_the_board.map((list) => (
-            <List key={list.list_id} list={list} setboard={setboard} />
+            <List key={list.list_id} list={list} setboard={setboard} board_id={board.board_id}/>
             
           ))}
 
