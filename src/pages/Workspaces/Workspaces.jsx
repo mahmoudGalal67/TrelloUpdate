@@ -9,6 +9,7 @@ import Spinner from "react-bootstrap/Spinner";
 import api from "../../apiAuth/auth";
 import { Modal, Button, Form } from "react-bootstrap";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { Dropdown } from "react-bootstrap";
 
 function Workspace() {
   const [loading, setLoading] = useState(true);
@@ -203,27 +204,34 @@ function Workspace() {
                 <h2>{workspace.workspace_name}</h2>
               </div>
               <div>
-                <Button
-                  variant="primary"
-                  onClick={() =>
-                    handleEditWorkspaceClick(
-                      workspace.workspace_id,
-                      workspace.name
-                    )
-                  }
-                  className="edit-workspace-button ms-2"
-                >
-                  <i className="fa-regular fa-pen-to-square"></i>
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() =>
-                    handleDeleteWorkspaceClick(workspace.workspace_id)
-                  }
-                  className="delete-workspace-button ms-2"
-                >
-                  <i className="fa-regular fa-trash-can"></i>
-                </Button>
+              <Dropdown>
+              <Dropdown.Toggle
+                    as="button"
+                    className="custom-dropdown-toggle p-0 text-dark no-caret"
+                  >
+                    <span className="vertical-dots">⋮</span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      onClick={() =>
+                        handleEditWorkspaceClick(
+                          workspace.workspace_id,
+                          workspace.workspace_name
+                        )
+                      }
+                    >
+                      <i className="fa-regular fa-pen-to-square me-2"></i> Edit
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() =>
+                        handleDeleteWorkspaceClick(workspace.workspace_id)
+                      }
+                      className="text-danger"
+                    >
+                      <i className="fa-regular fa-trash-can me-2"></i> Delete
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
             <div className="wrapper">

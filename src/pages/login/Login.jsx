@@ -27,6 +27,7 @@ function Login() {
   const { dispatch } = useContext(AuthContext);
 
   const handleLogin = async (values, { setSubmitting, setFieldError }) => {
+    dispatch({ type: "loading" });
     try {
       const response = await login(values);
       console.log("Login successful:", response.data.data);

@@ -73,6 +73,16 @@ nav .user-name {
   font-weight: 700;
 }
 
+.no-caret::after {
+  display: none !important;
+}
+.no-caret {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1;
+}
+
 @media (max-width: 800px) {
   nav .navbar-nav {
     gap: 8px;

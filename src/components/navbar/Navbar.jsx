@@ -10,15 +10,18 @@ import Cookies from "js-cookie";
 import api from "../../apiAuth/auth";
 import { AuthContext } from "../context/Auth";
 import "./navbar.css";
+import Dropdown from "react-bootstrap/Dropdown";
+import { useNavigate } from "react-router-dom";
 
 function NavBar({ workSpaces }) {
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
-  const { user } = useContext(AuthContext);
+  const { user, dispatch } = useContext(AuthContext);
   const workspaceTitle = useRef(null);
   const boardTitle = useRef(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   // const [assignedUsers, setAssignedUsers] = useState([]);
+  const navigate = useNavigate();
 
 
   const location = useLocation();
@@ -185,6 +188,21 @@ function NavBar({ workSpaces }) {
 //     }
 //   }
 // };
+const handleLogout = async () => {
+  try {
+    await api.post('/logout', {}, {
+      headers: { Authorization: `Bearer ${cookies}` },
+    });
+    Cookies.remove("token");
+    dispatch({ type: "logout" });
+    
+    navigate("/login", { replace: true }); 
+  } catch (err) {
+    console.error("Logout error:", err.message || "Unknown error");
+    setError(err.response?.data?.message || "Failed to log out.");
+  }
+};
+
 
 
   return (
@@ -286,9 +304,20 @@ function NavBar({ workSpaces }) {
               className="me-2"
               aria-label="Search"
             />
-            {user ? (
-              <div className="user-name">{Array.from(user.name)[0]}</div>
-            ) : (
+            {user ?  (
+              <Dropdown align="end">
+                <Dropdown.Toggle
+                  className="user-name no-caret"
+                  id="dropdown-basic"
+                >
+                  {user.name.charAt(0).toUpperCase()}
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            )  : (
               <Link to="/login">
                 <img
                   src="/avatar.jpg"
